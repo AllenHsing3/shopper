@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const ItemSchema = new mongoose.Schema({
   name: String,
-  quantityInStock: Number,
+  // quantityInStock: Number,
   description: String,
   images: [
     {
@@ -10,6 +10,7 @@ const ItemSchema = new mongoose.Schema({
     },
   ],
   price: Number,
+  category: String
 });
 
 module.exports = Item = mongoose.model('item', ItemSchema)
