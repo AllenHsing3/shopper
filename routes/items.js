@@ -47,12 +47,21 @@ router.get('/:category', async(req, res) => {
             return res.status(400).send('Category does not exists')
         }
         res.send(category)
-    } catch (error) {
+    } catch (err) {
         console.error(err.messages)
         res.status(500).send('Server Error')
     }
 })
 
-// Update Item
+// Get Item by ID
+router.get('/itemPage/:id', async(req, res) => {
+    try {
+        const item = await Item.findById(req.params.id)
+        res.send(item)
+    } catch (err) {
+        console.error(err.messages)
+        res.status(500).send('Server Error')
+    }
+})
 
 module.exports = router
