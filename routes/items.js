@@ -4,7 +4,7 @@ const Item = require('../models/Item')
 
 // Create new Item
 router.post('/newItem', async(req, res) => {
-    const {name, description, price, category} = req.body
+    const {name, description, price, category, longDescription} = req.body
     try {
         let item = await Item.findOne({name})
         if(item){
@@ -14,6 +14,7 @@ router.post('/newItem', async(req, res) => {
          item = new Item({
             name,
             description,
+            longDescription,
             price,
             category
         })
