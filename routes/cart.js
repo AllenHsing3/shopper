@@ -3,6 +3,7 @@ const Item = require('../models/Item');
 const User = require('../models/User');
 const Cart = require('../models/Cart');
 const router = express.Router();
+const auth = require('../middleware/auth')
 
 // Add item to cart:
 router.post('/addItem', async (req, res) => {
@@ -40,5 +41,16 @@ router.post('/addItem', async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+
+// LOAD CART
+router.get('/', auth, async(req, res) => {
+  try {
+    const cart = await Cart.findOne({userId:req.user.id})
+    res.send(cart)
+  } catch (err) {
+    console.error(err.message)
+    res.status(500).send('Server Error')
+  }
+})
 
 module.exports = router;
