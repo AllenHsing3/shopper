@@ -14,6 +14,7 @@ router.post('/addItem', async (req, res) => {
     if (!item) {
       return res.status(400).send('Item not found');
     }
+    const trimmedDescription = item.longDescription.substring(0, 150) + '...'
     if (!cart) {
       cart = new Cart({
         userId,
@@ -22,7 +23,11 @@ router.post('/addItem', async (req, res) => {
       cart.cartItems.push({
         cartItemName: item.name,
         cartItemId: itemId,
+        cartItemCategory: item.category,
         quantityInCart: quantity,
+        itemPrice: item.price,
+        itemDescriptionLong: trimmedDescription,
+        itemDescriptionShort: item.description
       });
       await cart.save();
       return res.status(201).send(cart);
@@ -30,7 +35,11 @@ router.post('/addItem', async (req, res) => {
       cart.cartItems.push({
         cartItemName: item.name,
         cartItemId: itemId,
+        cartItemCategory: item.category,
         quantityInCart: quantity,
+        itemPrice: item.price,
+        itemDescriptionLong: trimmedDescription,
+        itemDescriptionShort: item.description
       });
       cart.cartTotal += item.price * quantity;
       await cart.save();
@@ -50,6 +59,20 @@ router.get('/', auth, async(req, res) => {
   } catch (err) {
     console.error(err.message)
     res.status(500).send('Server Error')
+  }
+})
+
+router.delete('/:cartItemId', auth, async(req, res) => {
+  try {
+    const cart = await Cart.findOne({userId: req.user.id})
+    const removeIndex = cart.cartItems.indexOf(req.params.cartItemId)
+    cart.cartItems.splice(removeIndex, 1)
+    
+
+    await cart.save()
+    res.send(cart)
+  } catch (err) {
+    console.error(err.message)
   }
 })
 

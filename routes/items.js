@@ -40,10 +40,12 @@ router.delete('/deleteItem', async(req, res) => {
     }
 })
 
-// Get by category
+// Load all Items
 router.get('/:category', async(req, res) => {
     try {
-        const category = await Item.find({ category: req.params.category})
+        const category = await Item.find()
+
+        // const category = await Item.find({ category: req.params.category})
         if(category.length == 0 || !category){
             return res.status(400).send('Category does not exists')
         }
