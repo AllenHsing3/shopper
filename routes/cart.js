@@ -51,10 +51,39 @@ router.post('/addItem', async (req, res) => {
   }
 });
 
+// Create Cart
+router.post('/createNewCart', async(req, res) => {
+  const userId = req.body.userId
+  try {
+    const cart = new Cart({
+        userId,
+        cartTotal: 0
+      });
+      // cart.cartItems.push({
+      //   cartItemName: item.name,
+      //   cartItemId: itemId,
+      //   cartItemCategory: item.category,
+      //   quantityInCart: quantity,
+      //   itemPrice: item.price,
+      //   itemDescriptionLong: trimmedDescription,
+      //   itemDescriptionShort: item.description
+      // });
+      await cart.save();
+  } catch (err) {
+    console.error(err.message)
+  }
+})
+
 // LOAD CART
 router.get('/', auth, async(req, res) => {
   try {
-    const cart = await Cart.findOne({userId:req.user.id})
+    let cart = await Cart.findOne({userId:req.user.id})
+    if (!cart) {
+      cart = new Cart({
+        userId: req.user.Id
+      });
+    }
+      await cart.save();
     res.send(cart)
   } catch (err) {
     console.error(err.message)
@@ -65,9 +94,15 @@ router.get('/', auth, async(req, res) => {
 router.delete('/:cartItemId', auth, async(req, res) => {
   try {
     const cart = await Cart.findOne({userId: req.user.id})
-    const removeIndex = cart.cartItems.indexOf(req.params.cartItemId)
+
+    const removeIndex = cart.cartItems.map(e => e.cartItemId.indexOf(req.params.cartItemId))  
+    console.log(req.params.cartItemId)
+    console.log(removeIndex) 
+    console.log(cart.cartItems[removeIndex])
+    cart.cartTotal -= cart.cartItems[removeIndex].itemPrice
+
     cart.cartItems.splice(removeIndex, 1)
-    
+
 
     await cart.save()
     res.send(cart)
