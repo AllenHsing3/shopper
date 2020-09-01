@@ -82,8 +82,9 @@ router.get('/', auth, async(req, res) => {
       cart = new Cart({
         userId: req.user.Id
       });
-    }
       await cart.save();
+    }
+
     res.send(cart)
   } catch (err) {
     console.error(err.message)
@@ -95,10 +96,7 @@ router.delete('/:cartItemId', auth, async(req, res) => {
   try {
     const cart = await Cart.findOne({userId: req.user.id})
 
-    const removeIndex = cart.cartItems.map(e => e.cartItemId.indexOf(req.params.cartItemId))  
-    console.log(req.params.cartItemId)
-    console.log(removeIndex) 
-    console.log(cart.cartItems[removeIndex])
+    const removeIndex = cart.cartItems.map(e => e.cartItemId).indexOf(req.params.cartItemId)
     cart.cartTotal -= cart.cartItems[removeIndex].itemPrice
 
     cart.cartItems.splice(removeIndex, 1)
