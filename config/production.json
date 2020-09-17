@@ -1,0 +1,4 @@
+{
+    "mongoURI": "mongodb+srv://apple123:apple123@devconnector-fsv8i.mongodb.net/shopper?retryWrites=true&w=majority",
+    "jwtSecret": "pineapple123"
+}

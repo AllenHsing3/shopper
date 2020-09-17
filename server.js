@@ -1,7 +1,8 @@
 const express = require('express')
 const connectDB = require('./config/db')
-const app = express()
 const path = require('path')
+const app = express()
+
 app.use(express.json({extended: false}))
 app.use('/user', require('./routes/user'))
 app.use('/item', require('./routes/items'))
