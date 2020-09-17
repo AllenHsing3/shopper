@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Cart = ({ cart, isAuth }) => {
   const classes = useStyles();
-  return cart === null || isAuth === false || Object.keys(cart).length === 0 ?  (
+  return cart === null || isAuth === false  ?  (
     <Typography className={classes.text} align="center">
       Start shopping by{' '}
       <Button component={Link} to="/login">
@@ -44,7 +44,7 @@ const Cart = ({ cart, isAuth }) => {
     </Typography>
   ) : cart.cartItems.length === 0 && isAuth == true ? (
     <Typography className={classes.text} align="center">
-      You have no items in your cart. Get started by adding some!
+      You have no items in your cart. Get started by adding some items!
     </Typography>
   ) : (
     <Grid
