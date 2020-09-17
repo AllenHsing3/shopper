@@ -8,11 +8,10 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import {Link} from 'react-router-dom'
+import { Link, Redirect } from 'react-router-dom';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
-import { Redirect } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -50,10 +49,6 @@ const Navbar = ({ isAuthenticated, logout }) => {
     setAnchorEl(null);
     logout();
   };
-  // const handleLogin = (e) => {
-  //   e.preventDefault();
-  //   return <Redirect to="login" />;
-  // };
 
   const authLinks = (
     <Menu
@@ -63,16 +58,15 @@ const Navbar = ({ isAuthenticated, logout }) => {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItem onClick={handleClose}>My account</MenuItem>
+      <MenuItem onClick={handleClose}><Button component={Link} to='/'>Home</Button></MenuItem>
       <MenuItem onClick={(e) => handleLogout(e)}>
-      <Button component={Link} to="/">Logout</Button>
+        <Button component={Link} to="/">
+          Logout
+        </Button>
       </MenuItem>
     </Menu>
   );
- const handleRedirect = e => {
-   e.preventDefault()
-   return <Redirect to='/login'/>
- }
+
   const guestLinks = (
     <Menu
       id="simple-menu"
@@ -82,20 +76,24 @@ const Navbar = ({ isAuthenticated, logout }) => {
       onClose={handleClose}
     >
       <MenuItem onClick={handleClose}>
-        <Button component={Link} to="/login">Login</Button>
+        <Button component={Link} to="/login">
+          Login
+        </Button>
       </MenuItem>
       <MenuItem onClick={handleClose}>
-        <Button component={Link} to="/register">Register</Button>
+        <Button component={Link} to="/register">
+          Register
+        </Button>
       </MenuItem>
     </Menu>
   );
 
   const sections = [
-    { category: "What's New", url: '/category/new' },
     { category: 'Shirts', url: '/category/shirts' },
-    { category: 'Pants', url: '/category/pants' },
+    { category: 'Trousers', url: '/category/trousers' },
     { category: 'Shoes', url: '/category/shoes' },
-    { category: 'Accessories', url: '/category/accessories' },
+    { category: 'Watches', url: '/category/watches' },
+    { category: "About", url: '/about' },
   ];
 
   return (
@@ -112,7 +110,7 @@ const Navbar = ({ isAuthenticated, logout }) => {
           {isAuthenticated ? authLinks : guestLinks}
         </div>
         <div className={classes.toolbarTitle}>
-          <Button component={Link} to='/'>
+          <Button component={Link} to="/">
             <Typography color="inherit" variant="h4">
               Shopper
             </Typography>
@@ -158,7 +156,8 @@ const mapStateToProps = (state) => ({
 });
 export default connect(mapStateToProps, { logout })(Navbar);
 
-{/* <Link
+{
+  /* <Link
 color="inherit"
 noWrap
 key={section.category}
@@ -168,4 +167,5 @@ href={section.url}
 className={classes.toolbarLink}
 >
 {section.category}
-</Link> */}
+</Link> */
+}

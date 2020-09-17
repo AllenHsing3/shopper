@@ -13,10 +13,11 @@ import Cart from './components/cart/Cart';
 import Category from './components/shopCategory/Category';
 import ItemPage from './components/shopCategory/ItemPage';
 import SetAlert from './components/layout/Alert';
-import { loadCart } from './actions/item';
+import { loadCart, loadItems } from './actions/item';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './components/cart/CheckoutForm';
+import About from './components/home/About';
 
 if (localStorage.token) {
   setAuthToken(localStorage.token);
@@ -29,6 +30,7 @@ const promise = loadStripe(
 const App = () => {
   useEffect(() => {
     store.dispatch(loadUser());
+    store.dispatch(loadItems())
     store.dispatch(loadCart());
   }, []);
   return (
@@ -45,6 +47,7 @@ const App = () => {
             <Route exact path="/login" component={Login} />
             <Route exact path="/register" component={Register} />
             <Route exact path="/:category/item/:id" component={ItemPage} />
+            <Route exact path="/about" component={About} />
             <Elements stripe={promise}>
               <Route exact path="/checkout" component={CheckoutForm} />
             </Elements>

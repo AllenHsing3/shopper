@@ -8,13 +8,15 @@ import {
   LOAD_CART_FAIL,
   LOGGED_OUT,
   REMOVED_ITEM,
+  PAYMENTINTENT_SUCCESS,
 } from '../actions/types';
 
 const intialState = {
   loading: true,
   items: [],
   item: { name: '', description: '', longDescription: '', price: '' },
-  cart: null,
+  cart: { },
+  paymentIntent: null
 };
 export default function (state = intialState, action) {
   const { type, payload } = action;
@@ -47,15 +49,19 @@ export default function (state = intialState, action) {
       return {
         ...state,
         loading: true,
-        items: [],
         item: { name: '', description: '', longDescription: '', price: '' },
-        cart: null,
+        cart: {},
       }
     case REMOVED_ITEM:
       return {
         ...state,
         cart: payload   
       }
+      case PAYMENTINTENT_SUCCESS:
+        return{
+          ...state,
+          paymentIntent: payload
+        }
     default:
       return state;
   }

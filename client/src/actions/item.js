@@ -7,6 +7,7 @@ import {
   LOAD_CART_FAIL,
   LOAD_CART_SUCCESS,
   REMOVED_ITEM,
+  PAYMENTINTENT_SUCCESS,
 } from './types';
 import axios from 'axios';
 import setAuthToken from '../util/setAuthToken';
@@ -97,3 +98,23 @@ export const removeItem = (cartItemId) => async (dispatch) => {
     console.log(err.message);
   }
 };
+
+// Create payment intent:
+export const createPaymentIntent = (items) => async dispatch => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+    const body = JSON.stringify(items)
+    const res = await axios.post('/payment/create-payment-intent', body, config)
+    // setClientSecret(res.clientSecret)
+    dispatch({
+      type: PAYMENTINTENT_SUCCESS,
+      payload: res.data.clientSecret
+    })
+  } catch (err) {
+    console.error(err.message)
+  }
+}

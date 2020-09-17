@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => ({
 const Category = ({ match, loadItems, items, loading }) => {
   useEffect(() => {
     loadItems(match.params.category);
-  }, []);
+  }, [loadItems, match.params.category]);
   const classes = useStyles();
   return (
     <div>

@@ -9,6 +9,7 @@ import {
   Typography,
   Button,
   CssBaseline,
+  TextField,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import CardMedia from '@material-ui/core/CardMedia';
@@ -36,21 +37,21 @@ const ItemPage = ({
   isAuthenticated,
   setAlert,
   addToCart,
-  userId
+  userId,
 }) => {
   useEffect(() => {
     loadItem(match.params.id);
-  }, []);
+  }, [loadItem, match.params.id]);
   const classes = useStyles();
   const { name, description, price, longDescription, _id } = item;
   const handleClick = (e) => {
     e.preventDefault();
     if (isAuthenticated === false) {
       return setAlert('Please login to add to cart', 'error');
-    } else{
-    const quantity = "1"
-    addToCart({_id, quantity, userId});
-    setAlert('Added to cart', 'success')
+    } else {
+      const quantity = '1';
+      addToCart({ _id, quantity, userId });
+      setAlert('Added to cart', 'success');
     }
   };
   return (
@@ -74,7 +75,9 @@ const ItemPage = ({
                 <Typography variant="h4">{description}</Typography>
                 <Typography variant="h5">${price}</Typography>
                 <Typography variant="h5">{longDescription}</Typography>
-                <Button onClick={(e) => handleClick(e)}>Add to Cart</Button>
+                    {/* <TextField label="Quantity" variant="outlined" /> */}
+                    <Button onClick={(e) => handleClick(e)}>Add to Cart</Button>
+
               </Grid>
             </Grid>
           </div>

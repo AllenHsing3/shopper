@@ -1,8 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-
+import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 import CartItem from './CartItem';
@@ -13,8 +13,9 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   paper: {
-    padding: theme.spacing.unit * 2,
-    textAlign: 'center',
+    padding: theme.spacing(2),
+    margin: 'auto',
+    maxWidth: 900,
   },
   cardGrid: {
     paddingTop: theme.spacing(6),
@@ -23,11 +24,14 @@ const useStyles = makeStyles((theme) => ({
   text: {
     paddingTop: theme.spacing(24),
   },
+  totalBox: {
+    textAlign: 'end',
+  },
 }));
 
-const Cart = ({ cart }) => {
+const Cart = ({ cart, isAuth }) => {
   const classes = useStyles();
-  return cart === null  ? (
+  return cart === null || isAuth === false || Object.keys(cart).length === 0 ?  (
     <Typography className={classes.text} align="center">
       Start shopping by{' '}
       <Button component={Link} to="/login">
@@ -38,44 +42,44 @@ const Cart = ({ cart }) => {
         registering
       </Button>
     </Typography>
-  ) : cart.cartItems.length === 0  || Object.keys(cart).length === 0  ? (
+  ) : cart.cartItems.length === 0 && isAuth == true ? (
     <Typography className={classes.text} align="center">
-      You have no items in your cart.
+      You have no items in your cart. Get started by adding some!
     </Typography>
   ) : (
     <Grid
       // container
       maxWidth="md"
-      justify="center"
+      // justify="center"
       className={classes.cardGrid}
     >
       {cart.cartItems.map((cartItem) => (
         <CartItem cartItem={cartItem} />
       ))}
-      <Grid>
-        <Typography>${cart.cartTotal}</Typography>
-      </Grid>
+      <div className={classes.root}>
+        <Paper className={classes.paper}>
+            <Grid item className={classes.totalBox}>
+              <Typography >Total: ${cart.cartTotal}</Typography>
+              <Button component={Link} to='/checkout'>
+              Checkout
+              </Button>
+            </Grid>
+        </Paper>
+        </div>
+
     </Grid>
   );
 };
 
 Cart.propTypes = {
   cart: PropTypes.object.isRequired,
+  isAuth: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   cart: state.item.cart,
+  isAuth: state.auth.isAuthenticated
 });
 
 export default connect(mapStateToProps, {})(Cart);
-{
-  /* <div>
-<Container className={classes.cardGrid} maxWidth="md">
-  <Grid container spacing={1}>
-    {cart.cartItems.map((cartItem) => (
-      <CartItem cartItem={cartItem} />
-    ))}
-  </Grid>
-</Container>
-</div> */
-}
+

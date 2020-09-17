@@ -1,4 +1,4 @@
-import { LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_SUCCESS, REGISTER_FAIL, AUTH_FAIL, USER_LOADED, LOGGED_OUT,CLEAR_PROFILE } from './types';
+import { LOGIN_SUCCESS, LOGIN_FAIL, REGISTER_SUCCESS, REGISTER_FAIL, AUTH_FAIL, USER_LOADED, LOGGED_OUT } from './types';
 import axios from 'axios';
 import setAuthToken from '../util/setAuthToken'
 import { setAlert } from './alert';

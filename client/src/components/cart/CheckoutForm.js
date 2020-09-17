@@ -1,30 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { createPaymentIntent, loadCart } from '../../actions/item';
+import PropTypes from 'prop-types';
+import Spinner from '../layout/Spinner';
+import { connect } from 'react-redux';
+import { Redirect, Link } from 'react-router-dom';
 
-export default function CheckoutForm() {
+const CheckoutForm = ({ createPaymentIntent, paymentIntent, items, cartTotal, isAuthenticated }) => {
   const [succeeded, setSucceeded] = useState(false);
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState('');
   const [disabled, setDisabled] = useState(true);
-  const [clientSecret, setClientSecret] = useState('');
   const stripe = useStripe();
   const elements = useElements();
+
   useEffect(() => {
+    if(!isAuthenticated){
+      return <Redirect to='/' />
+    }
     // Create PaymentIntent as soon as the page loads
-    window
-      .fetch('/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ items: [{ id: 'xl-tshirt' }] }),
-      })
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-      });
+    async function loadIntent() {
+      await createPaymentIntent({ items });
+    }
+    loadIntent();
   }, []);
 
   const cardStyle = {
@@ -52,7 +50,7 @@ export default function CheckoutForm() {
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     setProcessing(true);
-    const payload = await stripe.confirmCardPayment(clientSecret, {
+    const payload = await stripe.confirmCardPayment(paymentIntent, {
       payment_method: {
         card: elements.getElement(CardElement),
       },
@@ -67,14 +65,17 @@ export default function CheckoutForm() {
     }
   };
 
-  return (
+  return paymentIntent == null ? (
+    <Spinner />
+  ) : (
+    <div align='center' >
+      <h3>Your cart total is: ${cartTotal}</h3>
     <form id="payment-form" onSubmit={handleSubmit}>
       <CardElement
         id="card-element"
         options={cardStyle}
         onChange={handleChange}
       />
-
       <button disabled={processing || disabled || succeeded} id="submit">
         <span id="button-text">
           {processing ? <div className="spinner" id="spinner"></div> : 'Pay'}
@@ -90,15 +91,27 @@ export default function CheckoutForm() {
       )}
 
       {/* Show a success message upon completion */}
-
       <p className={succeeded ? 'result-message' : 'result-message hidden'}>
-        Payment succeeded, see the result in your
-        <a href={`https://dashboard.stripe.com/test/payments`}>
-          {' '}
-          Stripe dashboard.
-        </a>{' '}
-        Refresh the page to pay again.
+        Payment succeeded! Thank you for trying out my website!
       </p>
     </form>
+    </div>
   );
-}
+};
+
+CheckoutForm.propTypes = {
+  createPaymentIntent: PropTypes.func.isRequired,
+  paymentIntent: PropTypes.string.isRequired,
+  isAuthenticated: PropTypes.bool.isRequired,
+  items: PropTypes.array.isRequired,
+  cartTotal: PropTypes.number.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  isAuthenticated: state.auth.isAuthenticated,
+  paymentIntent: state.item.paymentIntent,
+  items: state.item.cart.cartItems,
+  cartTotal: state.item.cart.cartTotal
+});
+
+export default connect(mapStateToProps, { createPaymentIntent })(CheckoutForm);
