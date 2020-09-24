@@ -8,8 +8,8 @@ import {
   LOAD_CART_SUCCESS,
   REMOVED_ITEM,
   PAYMENTINTENT_SUCCESS,
-  RECEIPT_FAIL, 
-  RECEIPT_CREATED
+  RECEIPT_FAIL,
+  RECEIPT_CREATED,
 } from './types';
 import axios from 'axios';
 import setAuthToken from '../util/setAuthToken';
@@ -102,42 +102,64 @@ export const removeItem = (cartItemId) => async (dispatch) => {
 };
 
 // Create payment intent:
-export const createPaymentIntent = (items) => async dispatch => {
+export const createPaymentIntent = (items) => async (dispatch) => {
   try {
     const config = {
       headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-    const body = JSON.stringify(items)
-    const res = await axios.post('/payment/create-payment-intent', body, config)
+        'Content-Type': 'application/json',
+      },
+    };
+    const body = JSON.stringify(items);
+    const res = await axios.post(
+      '/payment/create-payment-intent',
+      body,
+      config
+    );
     // setClientSecret(res.clientSecret)
     dispatch({
       type: PAYMENTINTENT_SUCCESS,
-      payload: res.data.clientSecret
-    })
+      payload: res.data.clientSecret,
+    });
   } catch (err) {
-    console.error(err.message)
+    console.error(err.message);
   }
-}
+};
 
 // Save Cart to Receipt, delete cart
-export const createReceipt = (cart) => async dispatch => {
+export const createReceipt = (cart) => async (dispatch) => {
   try {
-    const body = JSON.stringify(cart)
+    const body = JSON.stringify(cart);
     const config = {
       headers: {
-        "Content-Type": "application/json"
-      }
-    }
-    await axios.post('/receipt/create-receipt', body, config)
+        'Content-Type': 'application/json',
+      },
+    };
+    await axios.post('/receipt/create-receipt', body, config);
+    const res = await axios.delete(`/cart/delete-cart-items/${cart.userId}`);
     dispatch({
-      type: RECEIPT_CREATED
-    })
+      type: RECEIPT_CREATED,
+      payload: res.data,
+    });
   } catch (err) {
-    console.error(err.message)
+    console.error(err.message);
     dispatch({
-      type: RECEIPT_FAIL
-    })
+      type: RECEIPT_FAIL,
+    });
   }
-}
+};
+
+export const emailReceipt = (email, name, cart) => async (dispatch) => {
+  try {
+    cart.name = name;
+    cart.email = email;
+    const body = JSON.stringify(cart);
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    };
+    await axios.post('/email/receipt', body, config);
+  } catch (err) {
+    console.error(err.message);
+  }
+};

@@ -15,39 +15,39 @@ router.post('/addItem', async (req, res) => {
       return res.status(400).send('Item not found');
     }
     const trimmedDescription = item.longDescription.substring(0, 150) + '...';
-    if (!cart) {
-      cart = new Cart({
-        userId,
-        cartTotal: item.price * quantity,
-      });
-      cart.cartItems.push({
-        cartItemName: item.name,
-        cartItemId: itemId,
-        cartItemCategory: item.category,
-        quantityInCart: quantity,
-        itemPrice: item.price,
-        itemDescriptionLong: trimmedDescription,
-        itemDescriptionShort: item.description,
-      });
-      cart.cartTotal = parseFloat(cart.cartTotal).toFixed(2);
+    // if (!cart) {
+    //   cart = new Cart({
+    //     userId,
+    //     cartTotal: item.price * quantity,
+    //   });
+    //   cart.cartItems.push({
+    //     cartItemName: item.name,
+    //     cartItemId: itemId,
+    //     cartItemCategory: item.category,
+    //     quantityInCart: quantity,
+    //     itemPrice: item.price,
+    //     itemDescriptionShort: trimmedDescription,
+    //     itemDescriptionLong: item.description,
+    //   });
+    //   cart.cartTotal = parseFloat(cart.cartTotal).toFixed(2);
 
-      await cart.save();
-      return res.status(201).send(cart);
-    } else {
+    //   await cart.save();
+    //   return res.status(201).send(cart);
+    // } else {
       cart.cartItems.push({
         cartItemName: item.name,
         cartItemId: itemId,
         cartItemCategory: item.category,
         quantityInCart: quantity,
         itemPrice: item.price,
-        itemDescriptionLong: trimmedDescription,
-        itemDescriptionShort: item.description,
+        itemDescriptionShort: trimmedDescription,
+        itemDescriptionLong: item.description,
       });
       cart.cartTotal += item.price * quantity;
       cart.cartTotal = parseFloat(cart.cartTotal).toFixed(2);
       await cart.save();
       res.send(cart);
-    }
+    
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server Error');
@@ -114,5 +114,18 @@ router.delete('/:cartItemId', auth, async (req, res) => {
     console.error(err.message);
   }
 });
+
+// Delete all items in cart
+router.delete('/delete-cart-items/:userId', async(req, res) => {
+  try {
+    let cart = await Cart.findOne({ userId: req.params.userId });
+    cart.cartItems = []
+    cart.cartTotal = 0
+    await cart.save()
+    res.send(cart)
+  } catch (err) {
+    console.error(err.message)
+  }
+})
 
 module.exports = router;

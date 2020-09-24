@@ -68,6 +68,7 @@ export default function (state = intialState, action) {
     case RECEIPT_CREATED:
       return {
         ...state,
+        cart: payload
       };
     default:
       return state;

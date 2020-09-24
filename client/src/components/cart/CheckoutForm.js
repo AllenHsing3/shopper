@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { createPaymentIntent, loadCart, createReceipt } from '../../actions/item';
+import { createPaymentIntent, createReceipt, emailReceipt } from '../../actions/item';
 import PropTypes from 'prop-types';
 import Spinner from '../layout/Spinner';
 import { connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 
 
-const CheckoutForm = ({ createReceipt, createPaymentIntent, paymentIntent, items, cartTotal, isAuthenticated, cart }) => {
+const CheckoutForm = ({ emailReceipt, user ,createReceipt, createPaymentIntent, paymentIntent, items, cartTotal, isAuthenticated, cart }) => {
   const [succeeded, setSucceeded] = useState(false);
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState('');
@@ -19,11 +19,16 @@ const CheckoutForm = ({ createReceipt, createPaymentIntent, paymentIntent, items
     if(!isAuthenticated){
       return <Redirect to='/' />
     }
+    createPaymentIntent({ items })
     // Create PaymentIntent as soon as the page loads
-    async function loadIntent() {
-      await createPaymentIntent({ items });
-    }
-    loadIntent();
+    // async function loadIntent() {
+    //   try {
+    //     await createPaymentIntent({ items });
+    //   } catch (err) {
+    //     console.error(err.message)
+    //   }
+    // }
+    // loadIntent();
   }, []);
 
   const cardStyle = {
@@ -60,12 +65,12 @@ const CheckoutForm = ({ createReceipt, createPaymentIntent, paymentIntent, items
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
+      createReceipt(cart)
+      emailReceipt(user.email, user.name, cart)
       setError(null);
       setProcessing(false);
       setSucceeded(true);
-      // Save receipt
-      createReceipt(cart)
-
+      //Email Receipt
     }
   };
 
@@ -106,11 +111,13 @@ const CheckoutForm = ({ createReceipt, createPaymentIntent, paymentIntent, items
 CheckoutForm.propTypes = {
   createPaymentIntent: PropTypes.func.isRequired,
   paymentIntent: PropTypes.string.isRequired,
+  emailReceipt: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   cartTotal: PropTypes.number.isRequired,
   cart: PropTypes.object.isRequired,
   createReceipt: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -118,7 +125,8 @@ const mapStateToProps = (state) => ({
   paymentIntent: state.item.paymentIntent,
   items: state.item.cart.cartItems,
   cartTotal: state.item.cart.cartTotal,
-  cart: state.item.cart
+  cart: state.item.cart,
+  user: state.auth.user
 });
 
-export default connect(mapStateToProps, { createPaymentIntent, createReceipt })(CheckoutForm);
+export default connect(mapStateToProps, { createPaymentIntent, createReceipt, emailReceipt })(CheckoutForm);
