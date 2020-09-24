@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { createPaymentIntent, loadCart } from '../../actions/item';
+import { createPaymentIntent, loadCart, createReceipt } from '../../actions/item';
 import PropTypes from 'prop-types';
 import Spinner from '../layout/Spinner';
 import { connect } from 'react-redux';
 import { Redirect, Link } from 'react-router-dom';
 
-const CheckoutForm = ({ createPaymentIntent, paymentIntent, items, cartTotal, isAuthenticated }) => {
+
+const CheckoutForm = ({ createReceipt, createPaymentIntent, paymentIntent, items, cartTotal, isAuthenticated, cart }) => {
   const [succeeded, setSucceeded] = useState(false);
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState('');
@@ -62,6 +63,9 @@ const CheckoutForm = ({ createPaymentIntent, paymentIntent, items, cartTotal, is
       setError(null);
       setProcessing(false);
       setSucceeded(true);
+      // Save receipt
+      createReceipt(cart)
+
     }
   };
 
@@ -92,7 +96,7 @@ const CheckoutForm = ({ createPaymentIntent, paymentIntent, items, cartTotal, is
 
       {/* Show a success message upon completion */}
       <p className={succeeded ? 'result-message' : 'result-message hidden'}>
-        Payment succeeded! Thank you for trying out my website!
+      Payment succeeded, you should recieve an email confirmation email shortly! Your order number is {cart._id}. Click <Link to='/'>here</Link> to return.
       </p>
     </form>
     </div>
@@ -105,13 +109,16 @@ CheckoutForm.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   cartTotal: PropTypes.number.isRequired,
+  cart: PropTypes.object.isRequired,
+  createReceipt: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   isAuthenticated: state.auth.isAuthenticated,
   paymentIntent: state.item.paymentIntent,
   items: state.item.cart.cartItems,
-  cartTotal: state.item.cart.cartTotal
+  cartTotal: state.item.cart.cartTotal,
+  cart: state.item.cart
 });
 
-export default connect(mapStateToProps, { createPaymentIntent })(CheckoutForm);
+export default connect(mapStateToProps, { createPaymentIntent, createReceipt })(CheckoutForm);

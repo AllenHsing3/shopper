@@ -55,3 +55,4 @@ const ItemCard = ({ item: { name, description, price, _id }, category }) => {
 ItemCard.propTypes = {};
 
 export default ItemCard;
+

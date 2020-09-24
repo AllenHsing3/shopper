@@ -8,6 +8,8 @@ import {
   LOAD_CART_SUCCESS,
   REMOVED_ITEM,
   PAYMENTINTENT_SUCCESS,
+  RECEIPT_FAIL, 
+  RECEIPT_CREATED
 } from './types';
 import axios from 'axios';
 import setAuthToken from '../util/setAuthToken';
@@ -116,5 +118,26 @@ export const createPaymentIntent = (items) => async dispatch => {
     })
   } catch (err) {
     console.error(err.message)
+  }
+}
+
+// Save Cart to Receipt, delete cart
+export const createReceipt = (cart) => async dispatch => {
+  try {
+    const body = JSON.stringify(cart)
+    const config = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+    await axios.post('/receipt/create-receipt', body, config)
+    dispatch({
+      type: RECEIPT_CREATED
+    })
+  } catch (err) {
+    console.error(err.message)
+    dispatch({
+      type: RECEIPT_FAIL
+    })
   }
 }
