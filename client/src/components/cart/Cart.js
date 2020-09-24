@@ -48,9 +48,7 @@ const Cart = ({ cart, isAuth }) => {
     </Typography>
   ) : (
     <Grid
-      // container
       maxWidth="md"
-      // justify="center"
       className={classes.cardGrid}
     >
       {cart.cartItems.map((cartItem) => (

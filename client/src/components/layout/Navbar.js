@@ -58,7 +58,7 @@ const Navbar = ({ isAuthenticated, logout }) => {
       open={Boolean(anchorEl)}
       onClose={handleClose}
     >
-      <MenuItem onClick={handleClose}><Button component={Link} to='/'>Home</Button></MenuItem>
+      <MenuItem onClick={handleClose}><Button component={Link} to='/yourorders'>Your Orders</Button></MenuItem>
       <MenuItem onClick={(e) => handleLogout(e)}>
         <Button component={Link} to="/">
           Logout

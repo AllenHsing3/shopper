@@ -11,6 +11,8 @@ import {
   PAYMENTINTENT_SUCCESS,
   RECEIPT_CREATED,
   RECEIPT_FAIL,
+  RECEIPTS_LOADED,
+  RECEIPTS_LOAD_FAIL,
 } from '../actions/types';
 
 const intialState = {
@@ -19,6 +21,7 @@ const intialState = {
   item: { name: '', description: '', longDescription: '', price: '' },
   cart: {},
   paymentIntent: null,
+  receipts: [],
 };
 export default function (state = intialState, action) {
   const { type, payload } = action;
@@ -45,6 +48,7 @@ export default function (state = intialState, action) {
     case ADD_CART_FAIL:
     case LOAD_CART_FAIL:
     case RECEIPT_FAIL:
+    case RECEIPTS_LOAD_FAIL:
       return {
         ...state,
       };
@@ -68,7 +72,12 @@ export default function (state = intialState, action) {
     case RECEIPT_CREATED:
       return {
         ...state,
-        cart: payload
+        cart: payload,
+      };
+    case RECEIPTS_LOADED:
+      return {
+        ...state,
+        receipts: payload,
       };
     default:
       return state;

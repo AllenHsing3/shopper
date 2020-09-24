@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const config = require('config');
 const nodeMailer = require('nodemailer');
 
-router.post('/receipt', function (req, res) {
+router.post('/:receiptId', function (req, res) {
+  let receiptId = req.params.receiptId
   let { _id, name, cartItems, email, cartTotal } = req.body;
   let transporter = nodeMailer.createTransport({
     host: 'smtp.gmail.com',
@@ -21,7 +21,7 @@ router.post('/receipt', function (req, res) {
   }
   let mailOptions = {
     to: email,
-    subject: `Shopper Order Confirmation Number: ${_id}`,
+    subject: `Shopper Order Confirmation Number: ${receiptId}`,
     html: `<h3>Thank you for your order, ${name}! Here is your receipt for your recent order.</h3>` + htmlCartItems + `<h3>Total: $${cartTotal}</h3>`,
   };
   transporter.sendMail(mailOptions, (error, info) => {

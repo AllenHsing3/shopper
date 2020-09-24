@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { createPaymentIntent, createReceipt, emailReceipt } from '../../actions/item';
+import { createPaymentIntent, createReceipt } from '../../actions/item';
 import PropTypes from 'prop-types';
 import Spinner from '../layout/Spinner';
 import { connect } from 'react-redux';
@@ -65,12 +65,11 @@ const CheckoutForm = ({ emailReceipt, user ,createReceipt, createPaymentIntent, 
       setError(`Payment failed ${payload.error.message}`);
       setProcessing(false);
     } else {
-      createReceipt(cart)
-      emailReceipt(user.email, user.name, cart)
+      createReceipt(user.email, user.name, cart)
+      // emailReceipt(user.email, user.name, cart)
       setError(null);
       setProcessing(false);
       setSucceeded(true);
-      //Email Receipt
     }
   };
 
@@ -101,7 +100,7 @@ const CheckoutForm = ({ emailReceipt, user ,createReceipt, createPaymentIntent, 
 
       {/* Show a success message upon completion */}
       <p className={succeeded ? 'result-message' : 'result-message hidden'}>
-      Payment succeeded, you should recieve an email confirmation email shortly! Your order number is {cart._id}. Click <Link to='/'>here</Link> to return.
+      Payment succeeded, you should recieve an email confirmation email shortly! Click <Link to='/'>here</Link> to return.
       </p>
     </form>
     </div>
@@ -111,7 +110,6 @@ const CheckoutForm = ({ emailReceipt, user ,createReceipt, createPaymentIntent, 
 CheckoutForm.propTypes = {
   createPaymentIntent: PropTypes.func.isRequired,
   paymentIntent: PropTypes.string.isRequired,
-  emailReceipt: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
   items: PropTypes.array.isRequired,
   cartTotal: PropTypes.number.isRequired,
@@ -129,4 +127,4 @@ const mapStateToProps = (state) => ({
   user: state.auth.user
 });
 
-export default connect(mapStateToProps, { createPaymentIntent, createReceipt, emailReceipt })(CheckoutForm);
+export default connect(mapStateToProps, { createPaymentIntent, createReceipt })(CheckoutForm);

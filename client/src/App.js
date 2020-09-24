@@ -18,6 +18,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from './components/cart/CheckoutForm';
 import About from './components/home/About';
+import Orders from './components/Orders/Orders';
 
 if (localStorage.token) {
   setAuthToken(localStorage.token);
@@ -48,6 +49,7 @@ const App = () => {
             <Route exact path="/register" component={Register} />
             <Route exact path="/:category/item/:id" component={ItemPage} />
             <Route exact path="/about" component={About} />
+            <Route exact path="/yourOrders" component={Orders} />
             <Elements stripe={promise}>
               <Route exact path="/checkout" component={CheckoutForm} />
             </Elements>

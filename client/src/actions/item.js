@@ -10,6 +10,8 @@ import {
   PAYMENTINTENT_SUCCESS,
   RECEIPT_FAIL,
   RECEIPT_CREATED,
+  RECEIPTS_LOADED,
+  RECEIPTS_LOAD_FAIL,
 } from './types';
 import axios from 'axios';
 import setAuthToken from '../util/setAuthToken';
@@ -50,7 +52,6 @@ export const addToCart = ({ _id, quantity, userId }) => async (dispatch) => {
     quantity,
     userId,
   });
-  console.log(body);
   const config = {
     headers: {
       'Content-Type': 'application/json',
@@ -125,16 +126,24 @@ export const createPaymentIntent = (items) => async (dispatch) => {
   }
 };
 
-// Save Cart to Receipt, delete cart
-export const createReceipt = (cart) => async (dispatch) => {
+// Save Cart to Receipt, delete cartItems, email receipt
+export const createReceipt = (email, name, cart) => async (dispatch) => {
   try {
+    cart.name = name;
+    cart.email = email;
     const body = JSON.stringify(cart);
     const config = {
       headers: {
         'Content-Type': 'application/json',
       },
     };
-    await axios.post('/receipt/create-receipt', body, config);
+    const newReceipt = await axios.post(
+      '/receipt/create-receipt',
+      body,
+      config
+    );
+    console.log(newReceipt);
+    await axios.post(`/email/${newReceipt.data._id}`, body, config);
     const res = await axios.delete(`/cart/delete-cart-items/${cart.userId}`);
     dispatch({
       type: RECEIPT_CREATED,
@@ -148,18 +157,18 @@ export const createReceipt = (cart) => async (dispatch) => {
   }
 };
 
-export const emailReceipt = (email, name, cart) => async (dispatch) => {
+// Load Receipts
+export const loadReceipts = (userId) => async (dispatch) => {
   try {
-    cart.name = name;
-    cart.email = email;
-    const body = JSON.stringify(cart);
-    const config = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    await axios.post('/email/receipt', body, config);
+    const res = await axios.get(`/receipt/${userId}`);
+    dispatch({
+      type: RECEIPTS_LOADED,
+      payload: res.data,
+    });
   } catch (err) {
     console.error(err.message);
+    dispatch({
+      type: RECEIPTS_LOAD_FAIL,
+    });
   }
 };
